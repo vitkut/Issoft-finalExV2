@@ -37,21 +37,21 @@ public class Elevator extends Thread{
                             }
                             if(location > elevatorEvent.getToFloor()){
                                 location--;
-                                logger.debug("Moved down");
+                                logger.debug("Elevator "+idEl+" moved down");
                                 Thread.sleep(speed);
                             }
                             if(location < elevatorEvent.getToFloor()){
                                 location++;
-                                logger.debug("Moved up");
+                                logger.debug("Elevator "+idEl+" moved up");
                                 Thread.sleep(speed);
                             }
                         }
                         if(location.equals(elevatorEvent.getToFloor())){
                             isDoorsOpen = true;
-                            logger.debug("Open doors");
+                            logger.debug("Elevator "+idEl+" open doors");
                             Thread.sleep(doorsSpeed);
                             isDoorsOpen = false;
-                            logger.debug("Close doors");
+                            logger.debug("Elevator "+idEl+" close doors");
                             Thread.sleep(doorsSpeed);
                             events.removeFirst();
                         }

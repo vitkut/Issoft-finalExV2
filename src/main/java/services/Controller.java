@@ -11,12 +11,14 @@ public class Controller {
 
     private static final Logger logger = LoggerFactory.getLogger(Controller.class);
     private LinkedList<ControllerEvent> events = new LinkedList<ControllerEvent>();
+    private Statistic statistic;
     private ArrayList<Floor> floors;
     private ArrayList<Elevator> elevators;
 
-    public Controller(ArrayList<Floor> floors, ArrayList<Elevator> elevators) {
+    public Controller(ArrayList<Floor> floors, ArrayList<Elevator> elevators, Statistic statistic) {
         this.floors = floors;
         this.elevators = elevators;
+        this.statistic = statistic;
     }
 
     public void controlFloors(){
@@ -32,7 +34,6 @@ public class Controller {
                 }
             }
         }
-        //logger.debug("controlFloors");
     }
 
     private boolean containsInEvents(Integer floor, DirectionAction direction){
@@ -68,7 +69,7 @@ public class Controller {
         }
         for(ControllerEvent c:removeEventsList){
             events.remove(c);
-            //logger.debug("Remove controller event "+c);
+
         }
     }
 
@@ -109,7 +110,7 @@ public class Controller {
                 events.remove(c);
             }
         }
-        //logger.debug("Check elevators events");
+
     }
 
     private void insertEventToElevatorsEvents(ElevatorEvent event, Elevator elevator){
@@ -131,7 +132,7 @@ public class Controller {
             }
             elevator.getEvents().add(index, event);
         }
-        //logger.debug("Insert event to elevators events "+event);
+
     }
 
     public void humanControl(){
@@ -147,6 +148,8 @@ public class Controller {
                     }
                     for(Human h:removeHumans){
                         elevator.getHumans().remove(h);
+                        statistic.incrementTransported(elevator.getIdEl());
+                        statistic.incrementBroughtTo(floor.getNumber());
                     }
                     removeHumans.clear();
 
@@ -156,6 +159,7 @@ public class Controller {
                                 elevator.getHumans().add(h);
                                 addHumanRequestToEvents(elevator, h.getRequiredFloor(), DirectionAction.Up);
                                 removeHumans.add(h);
+                                statistic.incrementPickedUp(floor.getNumber());
                             }
                         }
                     }
@@ -165,6 +169,7 @@ public class Controller {
                                 elevator.getHumans().add(h);
                                 addHumanRequestToEvents(elevator, h.getRequiredFloor(), DirectionAction.Down);
                                 removeHumans.add(h);
+                                statistic.incrementPickedUp(floor.getNumber());
                             }
                         }
                     }
@@ -175,7 +180,7 @@ public class Controller {
                 }
             }
         }
-        //logger.debug("Human control");
+
     }
 
     private void addHumanRequestToEvents(Elevator elevator, Integer toFloor, DirectionAction direction){
@@ -183,7 +188,7 @@ public class Controller {
             ElevatorEvent elevatorEvent = new ElevatorEvent(direction, toFloor);
             insertEventToElevatorsEvents(elevatorEvent, elevator);
         }
-        //logger.debug("Add human request");
+
     }
 
     private Floor getFloorByNumber(Integer number){
@@ -214,5 +219,9 @@ public class Controller {
 
     public ArrayList<Floor> getFloors() {
         return floors;
+    }
+
+    public Statistic getStatistic() {
+        return statistic;
     }
 }
