@@ -24,25 +24,20 @@ public class Controller {
     public void controlFloors(){
         for(Floor f:floors){
             if(!f.getToUp().isEmpty()){
-                if(!containsInEvents(f.getNumber(), DirectionAction.Up)){
-                    events.add(new ControllerEvent(f.getNumber(), DirectionAction.Up));
+                if(!containsInEvents(f.getNumber(), DirectionEnum.Up)){
+                    events.add(new ControllerEvent(f.getNumber(), DirectionEnum.Up));
                 }
             }
             if(!f.getToDown().isEmpty()){
-                if(!containsInEvents(f.getNumber(), DirectionAction.Down)){
-                    events.add(new ControllerEvent(f.getNumber(), DirectionAction.Down));
+                if(!containsInEvents(f.getNumber(), DirectionEnum.Down)){
+                    events.add(new ControllerEvent(f.getNumber(), DirectionEnum.Down));
                 }
             }
         }
     }
 
-    private boolean containsInEvents(Integer floor, DirectionAction direction){
-        for(ControllerEvent e:events){
-            if(e.getFloor().equals(floor) && e.getDirection().equals(direction)){
-                return true;
-            }
-        }
-        return false;
+    private boolean containsInEvents(Integer floor, DirectionEnum direction){
+        return events.stream().anyMatch(e -> (e.getFloor().equals(floor) && e.getDirection().equals(direction)));
     }
 
     public void clearEventListDuplicates(){
@@ -67,55 +62,50 @@ public class Controller {
                 needToRemove = false;
             }
         }
-        for(ControllerEvent c:removeEventsList){
-            events.remove(c);
-
-        }
+        removeEventsList.forEach(r -> events.remove(r));
     }
 
     public void checkElevatorsEvents(){
         for(Elevator elevator:elevators){
-            ArrayList<ControllerEvent> removeEvents = new ArrayList<ControllerEvent>();
+            ArrayList<ControllerEvent> removeEventsList = new ArrayList<ControllerEvent>();
             for(ControllerEvent controllerEvent:events){
                 if(elevator.getEvents().isEmpty()){
                     elevator.getEvents().add(controllerEvent.toElevatorEvent());
-                    removeEvents.add(controllerEvent);
+                    removeEventsList.add(controllerEvent);
                 } else {
                     Integer location = elevator.getLocation();
                     Integer toFloor = controllerEvent.getFloor();
-                    DirectionAction action = null;
+                    DirectionEnum action = null;
                     for(ElevatorEvent elevatorEvent:elevator.getEvents()){
                         action = elevatorEvent.getDirection();
                         break;
                     }
                     if(action == null){
                         elevator.getEvents().add(controllerEvent.toElevatorEvent());
-                        removeEvents.add(controllerEvent);
+                        removeEventsList.add(controllerEvent);
                     } else {
                         if(action.equals(controllerEvent.getDirection())){
-                            if(action.equals(DirectionAction.Up) && location < toFloor){
+                            if(action.equals(DirectionEnum.Up) && location < toFloor){
                                 insertEventToElevatorsEvents(controllerEvent.toElevatorEvent(), elevator);
-                                removeEvents.add(controllerEvent);
+                                removeEventsList.add(controllerEvent);
                             }
-                            if(action.equals(DirectionAction.Down) && location > toFloor){
+                            if(action.equals(DirectionEnum.Down) && location > toFloor){
                                 insertEventToElevatorsEvents(controllerEvent.toElevatorEvent(), elevator);
-                                removeEvents.add(controllerEvent);
+                                removeEventsList.add(controllerEvent);
                             }
                         }
                     }
 
                 }
             }
-            for(ControllerEvent c:removeEvents){
-                events.remove(c);
-            }
+            removeEventsList.forEach(r -> events.remove(r));
         }
 
     }
 
     private void insertEventToElevatorsEvents(ElevatorEvent event, Elevator elevator){
         int index = 0;
-        if(event.getDirection().equals(DirectionAction.Up)){
+        if(event.getDirection().equals(DirectionEnum.Up)){
             for(int i = 0; i < elevator.getEvents().size()+1; i++){
                 if(i == elevator.getEvents().size() || event.getToFloor() > elevator.getEvents().get(i).getToFloor()){
                     index = i;
@@ -124,7 +114,7 @@ public class Controller {
             }
             elevator.getEvents().add(index, event);
         }
-        if(event.getDirection().equals(DirectionAction.Down)){
+        if(event.getDirection().equals(DirectionEnum.Down)){
             for(int i = 0; i < elevator.getEvents().size()+1; i++){
                 if(i == elevator.getEvents().size() || event.getToFloor() < elevator.getEvents().get(i).getToFloor()){
                     index = i;
@@ -140,50 +130,48 @@ public class Controller {
             if(elevator.isDoorsOpen()){
                 Floor floor = getFloorByNumber(elevator.getLocation());
                 if(floor != null){
-                    ArrayList<Human> removeHumans = new ArrayList<Human>();
-                    for(Human h:elevator.getHumans()){
-                        if(h.getRequiredFloor().equals(floor.getNumber())){
-                            removeHumans.add(h);
-                        }
-                    }
-                    for(Human h:removeHumans){
+                    ArrayList<Human> removeHumans = new ArrayList<>();
+
+                    elevator.getHumans().stream().filter(h -> h.getRequiredFloor().equals(floor.getNumber())).forEach(h -> removeHumans.add(h));
+                    removeHumans.forEach(h -> {
                         elevator.getHumans().remove(h);
                         statistic.incrementTransported(elevator.getIdEl());
                         statistic.incrementBroughtTo(floor.getNumber());
-                    }
+                    });
+
                     removeHumans.clear();
 
-                    if(elevator.getEvents().getFirst().getDirection().equals(DirectionAction.Up)){
-                        for(Human h:floor.getToUp()){
-                            if(elevator.getFreeCapacity()-h.getWeight() >= 0){
-                                elevator.getHumans().add(h);
-                                addHumanRequestToEvents(elevator, h.getRequiredFloor(), DirectionAction.Up);
-                                removeHumans.add(h);
-                                statistic.incrementPickedUp(floor.getNumber());
-                            }
-                        }
+                    if(elevator.getEvents().getFirst().getDirection().equals(DirectionEnum.Up)){
+                        floor.getToUp().stream()
+                                .filter(h -> elevator.getFreeCapacity()-h.getWeight() >= 0)
+                                .forEach(h -> {
+                                    elevator.getHumans().add(h);
+                                    addHumanRequestToEvents(elevator, h.getRequiredFloor(), DirectionEnum.Up);
+                                    removeHumans.add(h);
+                                    statistic.incrementPickedUp(floor.getNumber());
+                                });
                     }
-                    if(elevator.getEvents().getFirst().getDirection().equals(DirectionAction.Down)){
-                        for(Human h:floor.getToDown()){
-                            if(elevator.getFreeCapacity()-h.getWeight() >= 0){
-                                elevator.getHumans().add(h);
-                                addHumanRequestToEvents(elevator, h.getRequiredFloor(), DirectionAction.Down);
-                                removeHumans.add(h);
-                                statistic.incrementPickedUp(floor.getNumber());
-                            }
-                        }
+                    if(elevator.getEvents().getFirst().getDirection().equals(DirectionEnum.Down)){
+                        floor.getToDown().stream()
+                                .filter(h -> elevator.getFreeCapacity()-h.getWeight() >= 0)
+                                .forEach(h -> {
+                                    elevator.getHumans().add(h);
+                                    addHumanRequestToEvents(elevator, h.getRequiredFloor(), DirectionEnum.Down);
+                                    removeHumans.add(h);
+                                    statistic.incrementPickedUp(floor.getNumber());
+                                });
                     }
-                    for(Human h:removeHumans){
+                    removeHumans.forEach(h -> {
                         floor.getToUp().remove(h);
                         floor.getToDown().remove(h);
-                    }
+                    });
                 }
             }
         }
 
     }
 
-    private void addHumanRequestToEvents(Elevator elevator, Integer toFloor, DirectionAction direction){
+    private void addHumanRequestToEvents(Elevator elevator, Integer toFloor, DirectionEnum direction){
         if(!containsInElevatorEvents(elevator, toFloor, direction)){
             ElevatorEvent elevatorEvent = new ElevatorEvent(direction, toFloor);
             insertEventToElevatorsEvents(elevatorEvent, elevator);
@@ -200,13 +188,8 @@ public class Controller {
         return null;
     }
 
-    private boolean containsInElevatorEvents(Elevator elevator, Integer toFloor, DirectionAction direction){
-        for(ElevatorEvent e:elevator.getEvents()){
-            if(e.getToFloor().equals(toFloor) && e.getDirection().equals(direction)){
-                return true;
-            }
-        }
-        return false;
+    private boolean containsInElevatorEvents(Elevator elevator, Integer toFloor, DirectionEnum direction){
+        return elevator.getEvents().stream().anyMatch(e -> (e.getToFloor().equals(toFloor) && e.getDirection().equals(direction)));
     }
 
     public LinkedList<ControllerEvent> getEvents() {

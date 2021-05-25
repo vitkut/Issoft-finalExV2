@@ -2,20 +2,20 @@ package models;
 
 public class ElevatorEvent {
 
-    private DirectionAction direction;
+    private DirectionEnum direction;
     private Integer toFloor;
 
 
-    public ElevatorEvent(DirectionAction direction, Integer toFloor) {
+    public ElevatorEvent(DirectionEnum direction, Integer toFloor) {
         this.direction = direction;
         this.toFloor = toFloor;
     }
 
-    public DirectionAction getDirection() {
+    public DirectionEnum getDirection() {
         return direction;
     }
 
-    public void setDirection(DirectionAction direction) {
+    public void setDirection(DirectionEnum direction) {
         this.direction = direction;
     }
 

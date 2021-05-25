@@ -1,6 +1,6 @@
 package models;
 
-public enum DirectionAction {
+public enum DirectionEnum {
     Up,
     Down
 }

@@ -3,56 +3,54 @@ package models;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Statistic {
 
     //for each elevator
-    private ArrayList<AtomicInteger> numOfTransportedHumans = new ArrayList<AtomicInteger>();
+    private ArrayList<Integer> numOfTransportedHumans = new ArrayList<Integer>();
     //number of people picked up on the floor(for each floor)
-    private ArrayList<AtomicInteger> numOfPickedUp = new ArrayList<AtomicInteger>();
+    private ArrayList<Integer> numOfPickedUp = new ArrayList<Integer>();
     //the number of people brought to the floor (for each floor)
-    private ArrayList<AtomicInteger> numOfBroughtTo = new ArrayList<AtomicInteger>();
+    private ArrayList<Integer> numOfBroughtTo = new ArrayList<Integer>();
 
     public Statistic(int numOfFloors, int numOfElevators) {
         for(int i = 0; i < numOfElevators; i++){
-            numOfTransportedHumans.add(new AtomicInteger(0));
+            numOfTransportedHumans.add(0);
         }
         for(int i = 0; i < numOfFloors; i++){
-            numOfPickedUp.add(new AtomicInteger(0));
-            numOfBroughtTo.add(new AtomicInteger(0));
+            numOfPickedUp.add(0);
+            numOfBroughtTo.add(0);
         }
     }
 
-    public ArrayList<AtomicInteger> getNumOfTransportedHumans() {
+    public ArrayList<Integer> getNumOfTransportedHumans() {
         return numOfTransportedHumans;
     }
 
-    public ArrayList<AtomicInteger> getNumOfPickedUp() {
+    public ArrayList<Integer> getNumOfPickedUp() {
         return numOfPickedUp;
     }
 
-    public ArrayList<AtomicInteger> getNumOfBroughtTo() {
+    public ArrayList<Integer> getNumOfBroughtTo() {
         return numOfBroughtTo;
     }
 
     public int getNumOfTransportedAll(){
-        int integer = 0;
-        for(AtomicInteger i:numOfTransportedHumans){
-            integer += i.get();
-        }
-        return integer;
+        return numOfTransportedHumans.stream().mapToInt(a -> a).sum();
     }
 
     public void incrementTransported(int elevatorNumber){
-        numOfTransportedHumans.get(elevatorNumber).incrementAndGet();
+        numOfTransportedHumans.set(elevatorNumber, numOfTransportedHumans.get(elevatorNumber)+1);
     }
 
     public void incrementPickedUp(int floorNumber){
-        numOfPickedUp.get(floorNumber).incrementAndGet();
+        numOfPickedUp.set(floorNumber, numOfPickedUp.get(floorNumber)+1);
     }
 
     public void incrementBroughtTo(int floorNumber){
-        numOfBroughtTo.get(floorNumber).incrementAndGet();
+        numOfBroughtTo.set(floorNumber, numOfBroughtTo.get(floorNumber)+1);
     }
 
     @Override

@@ -20,9 +20,7 @@ public class Main {
         HumanSpawner humanSpawner = new HumanSpawner(controller.getFloors(), 500, 0.1d);
         consoleWriter.start();
         humanSpawner.start();
-        for(Elevator e:controller.getElevators()){
-            e.start();
-        }
+        controller.getElevators().forEach(e -> e.start());
         try{
             while (true){
                 controller.controlFloors();

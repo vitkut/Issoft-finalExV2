@@ -3,9 +3,9 @@ package models;
 public class ControllerEvent {
 
     private Integer floor;
-    private DirectionAction direction;
+    private DirectionEnum direction;
 
-    public ControllerEvent(Integer floor, DirectionAction direction) {
+    public ControllerEvent(Integer floor, DirectionEnum direction) {
         this.floor = floor;
         this.direction = direction;
     }
@@ -18,11 +18,11 @@ public class ControllerEvent {
         this.floor = floor;
     }
 
-    public DirectionAction getDirection() {
+    public DirectionEnum getDirection() {
         return direction;
     }
 
-    public void setDirection(DirectionAction direction) {
+    public void setDirection(DirectionEnum direction) {
         this.direction = direction;
     }
 

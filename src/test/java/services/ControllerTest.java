@@ -2,7 +2,7 @@ package services;
 
 import data.ControllerSamples;
 import models.ControllerEvent;
-import models.DirectionAction;
+import models.DirectionEnum;
 import models.ElevatorEvent;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,13 +23,13 @@ public class ControllerTest {
 
         //then
         assertEquals(0, event.getFloor());
-        assertEquals(DirectionAction.Up, event.getDirection());
+        assertEquals(DirectionEnum.Up, event.getDirection());
         assertEquals(1, event1.getFloor());
-        assertEquals(DirectionAction.Up, event1.getDirection());
+        assertEquals(DirectionEnum.Up, event1.getDirection());
         assertEquals(1, event2.getFloor());
-        assertEquals(DirectionAction.Down, event2.getDirection());
+        assertEquals(DirectionEnum.Down, event2.getDirection());
         assertEquals(3, event3.getFloor());
-        assertEquals(DirectionAction.Up, event3.getDirection());
+        assertEquals(DirectionEnum.Up, event3.getDirection());
     }
 
     @Test
@@ -55,10 +55,10 @@ public class ControllerTest {
         controller.controlFloors();
         controller.clearEventListDuplicates();
         controller.checkElevatorsEvents();
-        ElevatorEvent event = new ElevatorEvent(DirectionAction.Up, 0);
-        ElevatorEvent event1 = new ElevatorEvent(DirectionAction.Up, 1);
-        ElevatorEvent event2 = new ElevatorEvent(DirectionAction.Up, 3);
-        ElevatorEvent event3 = new ElevatorEvent(DirectionAction.Down, 1);
+        ElevatorEvent event = new ElevatorEvent(DirectionEnum.Up, 0);
+        ElevatorEvent event1 = new ElevatorEvent(DirectionEnum.Up, 1);
+        ElevatorEvent event2 = new ElevatorEvent(DirectionEnum.Up, 3);
+        ElevatorEvent event3 = new ElevatorEvent(DirectionEnum.Down, 1);
 
         //then
         assertTrue(controller.getEvents().isEmpty());
@@ -90,9 +90,6 @@ public class ControllerTest {
         controller.humanControl();
 
         //then
-        System.out.println(controller.getElevators());
-        System.out.println(controller.getEvents());
-        System.out.println(controller.getFloors());
         assertEquals(1, controller.getElevators().get(0).getHumans().size());
     }
 }
