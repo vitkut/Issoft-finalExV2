@@ -2,39 +2,36 @@ package models;
 
 public class ElevatorEvent {
 
-    private ElevatorAction action;
-    private Integer moveToFloor;
+    private DirectionAction direction;
+    private Integer toFloor;
 
-    public ElevatorEvent(ElevatorAction action) {
-        this.action = action;
+
+    public ElevatorEvent(DirectionAction direction, Integer toFloor) {
+        this.direction = direction;
+        this.toFloor = toFloor;
     }
 
-    public ElevatorEvent(ElevatorAction action, Integer moveToFloor) {
-        this.action = action;
-        this.moveToFloor = moveToFloor;
+    public DirectionAction getDirection() {
+        return direction;
     }
 
-    public ElevatorAction getAction() {
-        return action;
+    public void setDirection(DirectionAction direction) {
+        this.direction = direction;
     }
 
-    public void setAction(ElevatorAction action) {
-        this.action = action;
+    public Integer getToFloor() {
+        return toFloor;
     }
 
-    public Integer getMoveToFloor() {
-        return moveToFloor;
-    }
-
-    public void setMoveToFloor(Integer moveToFloor) {
-        this.moveToFloor = moveToFloor;
+    public void setToFloor(Integer toFloor) {
+        this.toFloor = toFloor;
     }
 
     @Override
     public String toString() {
         return "ElevatorEvent{" +
-                "a=" + action +
-                ", mToF=" + moveToFloor +
+                "dir=" + direction +
+                ", toF=" + toFloor +
                 '}';
     }
 }
