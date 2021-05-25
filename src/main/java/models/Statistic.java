@@ -37,10 +37,6 @@ public class Statistic {
         return numOfBroughtTo;
     }
 
-    public int getNumOfTransportedAll(){
-        return numOfTransportedHumans.stream().mapToInt(a -> a).sum();
-    }
-
     public void incrementTransported(int elevatorNumber){
         numOfTransportedHumans.set(elevatorNumber, numOfTransportedHumans.get(elevatorNumber)+1);
     }
